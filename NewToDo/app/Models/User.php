@@ -2,47 +2,53 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Task;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    /* -----------------------------------------------------------------
+     |  Mass‑assignable attributes
+     |------------------------------------------------------------------*/
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',          // 'admin' or 'user'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    /* -----------------------------------------------------------------
+     |  Default attribute values
+     |------------------------------------------------------------------*/
+    protected $attributes = [
+        'role' => 'user',    // every new account starts as a regular user
+    ];
+
+    /* -----------------------------------------------------------------
+     |  Hidden / cast attributes
+     |------------------------------------------------------------------*/
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+    ];
+
+    /* -----------------------------------------------------------------
+     |  Relationships
+     |------------------------------------------------------------------*/
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * All tasks created by this user.
      */
-    protected function casts(): array
+    public function tasks()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Task::class);
     }
 }
